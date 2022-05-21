@@ -3,6 +3,7 @@ import { View, Text, ScrollView } from 'react-native';
 import { Card } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
+import Loading from './LoadingComponent';
 
 const mapStateToProps = state => {
     return {
@@ -13,21 +14,33 @@ const mapStateToProps = state => {
 };
 
 
-function RenderItem({item}) {
-    if (item) {
+function RenderItem(props) {
+    const {item} = props;
+
+    if (props.isLoading) {
+        return <Loading />;
+    }
+    if (props.errMess) {
         return (
-            <Card
-                featuredTitle={item.name}
-                image={{uri: baseUrl + item.image}}>
-            
-                <Text style={{margin: 10}}>
-                    {item.description}
-                </Text>
-            </Card>
+            <View>
+                <Text>{props.errMess}</Text>
+            </View>
         );
     }
-    return <View />;
-}
+    if (item) {
+    
+            return (
+                <Card
+                    featuredTitle={item.name}
+                    image={{uri: baseUrl + item.image}}>
+                    <Text style={{margin: 10}}>
+                        {item.description}
+                    </Text>
+                </Card>
+            );
+        }
+            return <View />;
+    }
 class Home extends Component {
 
     static navigationOptions = {
@@ -38,16 +51,22 @@ class Home extends Component {
     render() {
         return (
             <ScrollView>
-                <RenderItem 
+               <RenderItem
                     item={this.props.campsites.campsites.filter(campsite => campsite.featured)[0]}
+                    isLoading={this.props.campsites.isLoading}
+                    errMess={this.props.campsites.errMess}
                 />
-                <RenderItem 
+                <RenderItem
                     item={this.props.promotions.promotions.filter(promotion => promotion.featured)[0]}
+                    isLoading={this.props.promotions.isLoading}
+                    errMess={this.props.promotions.errMess}
                 />
-                <RenderItem 
+                <RenderItem
                     item={this.props.partners.partners.filter(partner => partner.featured)[0]}
+                    isLoading={this.props.partners.isLoading}
+                    errMess={this.props.partners.errMess}
                 />
-            </ScrollView>
+                </ScrollView>
         );
     }
 }
